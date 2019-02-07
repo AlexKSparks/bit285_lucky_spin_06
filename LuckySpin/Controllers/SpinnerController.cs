@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using LuckySpin.Models;
+using LuckySpin.ViewModels;
 
 namespace LuckySpin.Controllers
 {
@@ -15,10 +16,10 @@ namespace LuckySpin.Controllers
         /***
          * Controller Constructor
          */
-        public SpinnerController()
+        public SpinnerController(LuckySpinDataContext db)
         {
             random = new Random();
-            //TODO: Inject the LuckySpinDataContext
+            _dbc = db;
         }
 
         /***
@@ -36,28 +37,41 @@ namespace LuckySpin.Controllers
         {
             if (!ModelState.IsValid) { return View(); }
 
-            // TODO: Add the Player to the DB and save the changes
+            _dbc.Players.Add(player);
+            _dbc.SaveChanges();
 
+            SpinViewModel spin = new SpinViewModel
+            {
+                FirstName = player.FirstName,
+                Luck = player.Luck,
+                Balance = player.Balance
+            };
             // TODO: BONUS: Build a new SpinItViewModel object with data from the Player and pass it to the View
 
-            return RedirectToAction("SpinIt");
+            return RedirectToAction("SpinIt", spin);
         }
 
         /***
          * Spin Action
          **/  
                
-         public IActionResult SpinIt()
+         public IActionResult SpinIt(SpinViewModel spin)
         {
-            Spin spin = new Spin
-            {
-                //Luck = player.Luck,
-                A = random.Next(1, 10),
-                B = random.Next(1, 10),
-                C = random.Next(1, 10)
-            };
+
+            spin.A = random.Next(1, 10);
+            spin.B = random.Next(1, 10);
+            spin.C = random.Next(1, 10);
+
+
 
             spin.IsWinning = (spin.A == spin.Luck || spin.B == spin.Luck || spin.C == spin.Luck);
+
+            Spin spinspin = new Spin()
+            {
+                IsWinning = spin.IsWinning
+            };
+            _dbc.Spins.Add(spinspin);
+            _dbc.SaveChanges();
 
             //Add to Spin Repository
             //repository.AddSpin(spin);

@@ -27,9 +27,9 @@
             <span asp-validation-for="Luck"></span>
         </label>
         <label>
-            <input placeholder=" Beginning Balance" /> <!-- TODO: Connect this to your model's balance property -->
+            <input asp-for="Balance" placeholder=" Beginning Balance" /> <!-- TODO: Connect this to your model's balance property -->
         </label>
-        <span></span>
+        <span asp-validation-for="Balance"></span>
     </fieldset>
     <input type="submit" value="Start the Game" />
 </form>
